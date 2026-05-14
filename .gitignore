@@ -1,0 +1,25 @@
+# Secrets and Environment Variables
+.env
+.env.*
+!.env.example
+
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+dist/
+out-tsc/
+bazel-out/
+.angular/
+
+# Testing
+coverage/
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

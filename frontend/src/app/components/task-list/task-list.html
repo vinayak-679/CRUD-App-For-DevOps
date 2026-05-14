@@ -1,0 +1,67 @@
+<div class="page-container">
+  <header class="header">
+    <div class="header-left">
+      <h1>Task Manager</h1>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-outline" (click)="logout()" id="logout-btn-tasks">Logout</button>
+    </div>
+  </header>
+
+  <nav class="nav-bar">
+    <a routerLink="/dashboard" class="nav-link">Dashboard</a>
+    <a routerLink="/tasks" class="nav-link active">Tasks</a>
+  </nav>
+
+  <main class="content">
+    <div class="content-header">
+      <h2>Tasks</h2>
+      <a routerLink="/tasks/new" class="btn btn-primary" id="add-task-btn">+ New Task</a>
+    </div>
+
+    @if (deleteMessage) {
+      <div class="alert alert-success">{{ deleteMessage }}</div>
+    }
+
+    @if (isLoading) {
+      <div class="loading">Loading tasks...</div>
+    } @else if (tasks.length === 0) {
+      <div class="empty-state">
+        <p>No tasks found. Create your first task!</p>
+        <a routerLink="/tasks/new" class="btn btn-primary">+ Create Task</a>
+      </div>
+    } @else {
+      <div class="task-table-wrapper">
+        <table class="task-table" id="task-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (task of tasks; track task._id) {
+              <tr>
+                <td class="task-title">{{ task.title }}</td>
+                <td class="task-desc">{{ task.description || '—' }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusClass(task.status)">
+                    {{ task.status }}
+                  </span>
+                </td>
+                <td class="task-date">{{ task.createdAt | date: 'short' }}</td>
+                <td class="task-actions">
+                  <a [routerLink]="['/tasks', 'edit', task._id]" class="btn-icon btn-edit" title="Edit">✏️</a>
+                  <button (click)="deleteTask(task._id!)" class="btn-icon btn-delete" title="Delete">🗑️</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+</div>
