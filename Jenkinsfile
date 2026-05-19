@@ -5,14 +5,20 @@ pipeline {
         DOCKER_HUB = "vinayakhebbar"
         TAG = "${BUILD_NUMBER}"
         EC2_USER = "ubuntu"
-        EC2_HOST = "YOUR_EC2_PUBLIC_IP"
+        EC2_HOST = "3.219.167.188"
     }
 
     stages {
 
-        stage('Checkout Code') {
+        // stage('Checkout Code') {
+        //     steps {
+        //         git branch: 'main', url: 'YOUR_REPO_URL'
+        //     }
+        // }
+
+        stage('Test Docker Build') {
             steps {
-                git branch: 'main', url: 'YOUR_REPO_URL'
+                sh 'docker --version'
             }
         }
 
@@ -38,83 +44,83 @@ pipeline {
             }
         }
 
-        stage('Deploy (Blue-Green via EC2 script)') {
-            steps {
-                sh """
-                ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
+        // stage('Deploy (Blue-Green via EC2 script)') {
+        //     steps {
+        //         sh """
+        //         ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
 
-                # STEP 1: write TAG into correct env folder
-                ENV=$(cat /opt/crudapp/state/active_env)
+        //         # STEP 1: write TAG into correct env folder
+        //         ENV=$(cat /opt/crudapp/state/active_env)
 
-                if [ "$ENV" == "blue" ]; then
-                    TARGET="green"
-                else
-                    TARGET="blue"
-                fi
+        //         if [ "$ENV" == "blue" ]; then
+        //             TARGET="green"
+        //         else
+        //             TARGET="blue"
+        //         fi
 
-                echo "TAG=$TAG" > /opt/crudapp/$TARGET/.env
+        //         echo "TAG=$TAG" > /opt/crudapp/$TARGET/.env
 
-                echo "Deploying application..."
-                cd /opt/crudapp/deployment
-                ./deploy.sh
-                '
-                """
-            }
-        }
+        //         echo "Deploying application..."
+        //         cd /opt/crudapp/deployment
+        //         ./deploy.sh
+        //         '
+        //         """
+        //     }
+        // }
 
-        stage('Health Check') {
-            steps {
-                script {
-                    sh """
-                    ssh $EC2_USER@$EC2_HOST '
+        // stage('Health Check') {
+        //     steps {
+        //         script {
+        //             sh """
+        //             ssh $EC2_USER@$EC2_HOST '
 
-                    ENV=$(cat /opt/crudapp/state/active_env)
+        //             ENV=$(cat /opt/crudapp/state/active_env)
 
-                    if [ "$ENV" == "blue" ]; then
-                        TARGET="green"
-                    else
-                        TARGET="blue"
-                    fi
+        //             if [ "$ENV" == "blue" ]; then
+        //                 TARGET="green"
+        //             else
+        //                 TARGET="blue"
+        //             fi
 
-                    cd /opt/crudapp/scripts
-                    ./health-check.sh $TARGET
-                    '
-                    """
-                }
-            }
-        }
+        //             cd /opt/crudapp/scripts
+        //             ./health-check.sh $TARGET
+        //             '
+        //             """
+        //         }
+        //     }
+        // }
 
-        stage('Switch Traffic') {
-            steps {
-                sh """
-                ssh $EC2_USER@$EC2_HOST '
+        // stage('Switch Traffic') {
+        //     steps {
+        //         sh """
+        //         ssh $EC2_USER@$EC2_HOST '
 
-                ENV=$(cat /opt/crudapp/state/active_env)
+        //         ENV=$(cat /opt/crudapp/state/active_env)
 
-                if [ "$ENV" == "blue" ]; then
-                    TARGET="green"
-                else
-                    TARGET="blue"
-                fi
+        //         if [ "$ENV" == "blue" ]; then
+        //             TARGET="green"
+        //         else
+        //             TARGET="blue"
+        //         fi
 
-                cd /opt/crudapp/scripts
-                ./switch.sh $TARGET
-                '
-                """
-            }
-        }
+        //         cd /opt/crudapp/scripts
+        //         ./switch.sh $TARGET
+        //         '
+        //         """
+        //     }
+        // }
     }
 
-    post {
-        failure {
-            steps {
-                sh """
-                ssh $EC2_USER@$EC2_HOST '
-                cd /opt/crudapp/scripts
-                ./rollback.sh
-                '
-                """
-            }
-        }
-    }
+    // post {
+    //     failure {
+    //         steps {
+    //             sh """
+    //             ssh $EC2_USER@$EC2_HOST '
+    //             cd /opt/crudapp/scripts
+    //             ./rollback.sh
+    //             '
+    //             """
+    //         }
+    //     }
+    // }
 }
