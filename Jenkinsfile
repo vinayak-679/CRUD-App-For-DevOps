@@ -58,7 +58,7 @@ pipeline {
                     TARGET="blue"
                 fi
 
-                echo "TAG=$TAG" > /opt/crudapp/$TARGET/.env
+                echo "TAG=$TAG" > /opt/crudapp/\$TARGET/.env
 
                 echo "Deploying application..."
                 cd /opt/crudapp/deployment
@@ -83,7 +83,7 @@ pipeline {
                     fi
 
                     cd /opt/crudapp/scripts
-                    ./health-check.sh $TARGET
+                    ./health-check.sh \$TARGET
                     '
                     """
                 }
@@ -104,7 +104,7 @@ pipeline {
                 fi
 
                 cd /opt/crudapp/scripts
-                ./switch.sh $TARGET
+                ./switch.sh \$TARGET
                 '
                 """
             }
