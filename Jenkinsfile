@@ -44,6 +44,17 @@ pipeline {
             }
         }
 
+        stage('Cleanup Local Docker Images') {
+            steps {
+                sh """
+                docker rmi $DOCKER_HUB/crudapp-backend:$TAG || true
+                docker rmi $DOCKER_HUB/crudapp-frontend:$TAG || true
+
+                docker image prune -f
+                """
+            }
+        }
+
         stage('Deploy (Blue-Green via EC2 script)') {
             steps {
                 sh """
