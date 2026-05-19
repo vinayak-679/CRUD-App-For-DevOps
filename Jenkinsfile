@@ -16,33 +16,33 @@ pipeline {
         //     }
         // }
 
-        stage('Test Docker Build') {
+        // stage('Test Docker Build') {
+        //     steps {
+        //         sh 'docker --version'
+        //     }
+        // }
+
+        stage('Build Docker Images') {
             steps {
-                sh 'docker --version'
+                sh """
+                docker build -t $DOCKER_HUB/crudapp-backend:$TAG ./backend
+                docker build -t $DOCKER_HUB/crudapp-frontend:$TAG ./frontend
+                """
             }
         }
 
-        // stage('Build Docker Images') {
-        //     steps {
-        //         sh """
-        //         docker build -t $DOCKER_HUB/crudapp-backend:$TAG ./backend
-        //         docker build -t $DOCKER_HUB/crudapp-frontend:$TAG ./frontend
-        //         """
-        //     }
-        // }
+        stage('Push Images to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh """
+                    echo $PASS | docker login -u $USER --password-stdin
 
-        // stage('Push Images to DockerHub') {
-        //     steps {
-        //         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-        //             sh """
-        //             echo $PASS | docker login -u $USER --password-stdin
-
-        //             docker push $DOCKER_HUB/crudapp-backend:$TAG
-        //             docker push $DOCKER_HUB/crudapp-frontend:$TAG
-        //             """
-        //         }
-        //     }
-        // }
+                    docker push $DOCKER_HUB/crudapp-backend:$TAG
+                    docker push $DOCKER_HUB/crudapp-frontend:$TAG
+                    """
+                }
+            }
+        }
 
         stage('Deploy (Blue-Green via EC2 script)') {
             steps {
