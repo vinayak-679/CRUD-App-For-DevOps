@@ -50,9 +50,9 @@ pipeline {
                 ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
 
                 # STEP 1: write TAG into correct env folder
-                ENV=$(cat /opt/crudapp/state/active_env)
+                ENV=\$(cat /opt/crudapp/state/active_env)
 
-                if [ "$ENV" == "blue" ]; then
+                if [ "\$ENV" == "blue" ]; then
                     TARGET="green"
                 else
                     TARGET="blue"
@@ -74,9 +74,9 @@ pipeline {
                     sh """
                     ssh $EC2_USER@$EC2_HOST '
 
-                    ENV=$(cat /opt/crudapp/state/active_env)
+                    ENV=\$(cat /opt/crudapp/state/active_env)
 
-                    if [ "$ENV" == "blue" ]; then
+                    if [ "\$ENV" == "blue" ]; then
                         TARGET="green"
                     else
                         TARGET="blue"
@@ -95,9 +95,9 @@ pipeline {
                 sh """
                 ssh $EC2_USER@$EC2_HOST '
 
-                ENV=$(cat /opt/crudapp/state/active_env)
+                ENV=\$(cat /opt/crudapp/state/active_env)
 
-                if [ "$ENV" == "blue" ]; then
+                if [ "\$ENV" == "blue" ]; then
                     TARGET="green"
                 else
                     TARGET="blue"
