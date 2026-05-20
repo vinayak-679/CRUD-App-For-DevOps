@@ -1,0 +1,113 @@
+<div class="dashboard-container">
+  <header class="header">
+    <div class="header-left">
+      <h1>Task Manager</h1>
+    </div>
+    <div class="header-right">
+      <span class="username">{{ username }}</span>
+      <button class="btn btn-outline" (click)="logout()" id="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <nav class="nav-bar">
+    <a routerLink="/dashboard" class="nav-link">Dashboard</a>
+    <a routerLink="/tasks" class="nav-link">Tasks</a>
+    <a routerLink="/stress-test" class="nav-link active">Stress Test</a>
+  </nav>
+
+  <main class="content">
+    <div class="page-header">
+      <div class="page-title-group">
+        <h2>☁️ CloudWatch Stress Test</h2>
+        <p class="page-subtitle">Trigger controlled resource spikes to test your CloudWatch alarms</p>
+      </div>
+      <button class="btn btn-danger btn-stop-all" (click)="stopAll()" [disabled]="!hasActiveSpike" id="stop-all-btn">
+        ⏹ Stop All Spikes
+      </button>
+    </div>
+
+    <div class="toast" *ngIf="statusMessage" [ngClass]="'toast-' + statusType">
+      {{ statusMessage }}
+    </div>
+
+    <div class="system-info-bar">
+      <div class="sys-item">
+        <span class="sys-label">CPU Cores</span>
+        <span class="sys-value">{{ systemInfo.cpuCores }}</span>
+      </div>
+      <div class="sys-item">
+        <span class="sys-label">Total RAM</span>
+        <span class="sys-value">{{ systemInfo.totalMemoryMB }} MB</span>
+      </div>
+      <div class="sys-item">
+        <span class="sys-label">Free RAM</span>
+        <span class="sys-value">{{ systemInfo.freeMemoryMB }} MB</span>
+      </div>
+      <div class="sys-item">
+        <span class="sys-label">Load Avg</span>
+        <span class="sys-value">{{ systemInfo.loadAverage[0]?.toFixed(2) }}</span>
+      </div>
+      <div class="sys-item">
+        <span class="sys-label">Uptime</span>
+        <span class="sys-value">{{ formatUptime(systemInfo.uptime) }}</span>
+      </div>
+    </div>
+
+    <div class="spike-cards-grid">
+      <div class="spike-card" *ngFor="let card of cards" [ngClass]="{ 'spike-card--active': card.status.state === 'running' }">
+        <div class="spike-card-header">
+          <div class="spike-icon">{{ card.icon }}</div>
+          <div class="spike-info">
+            <h3>{{ card.label }}</h3>
+            <p class="spike-desc">{{ card.description }}</p>
+          </div>
+          <div class="status-badge" [ngClass]="{ 'badge-idle': card.status.state === 'idle', 'badge-running': card.status.state === 'running', 'badge-error': card.status.state === 'error' }">
+            <span class="badge-dot"></span>
+            {{ card.status.state | titlecase }}
+          </div>
+        </div>
+
+        <div class="spike-progress" *ngIf="card.status.state === 'running'">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="card.status.duration ? ((card.status.elapsedSeconds || 0) / card.status.duration) * 100 : 0"></div>
+          </div>
+          <div class="progress-text">{{ card.status.remainingSeconds || 0 }}s remaining</div>
+        </div>
+
+        <div class="spike-controls">
+          <div class="control-row">
+            <label class="control-label">Duration</label>
+            <select class="control-select" [(ngModel)]="card.duration" [disabled]="card.status.state === 'running'" [id]="'duration-' + card.type">
+              <option *ngFor="let opt of durationOptions" [ngValue]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div class="control-row" *ngIf="card.extraLabel">
+            <label class="control-label">{{ card.extraLabel }}</label>
+            <select class="control-select" [(ngModel)]="card.extraParam" [disabled]="card.status.state === 'running'" [id]="'extra-' + card.type">
+              <option *ngFor="let opt of card.extraOptions" [ngValue]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="spike-actions">
+          <button class="btn btn-spike" [ngClass]="'btn-spike-' + card.type" (click)="triggerSpike(card)" [disabled]="card.status.state === 'running'" [id]="'spike-' + card.type + '-btn'">
+            <span *ngIf="card.status.state !== 'running'">🚀 Spike {{ card.label }}</span>
+            <span *ngIf="card.status.state === 'running'" class="running-text">
+              <span class="spinner"></span> Running...
+            </span>
+          </button>
+          <button class="btn btn-stop" (click)="stopSpike(card.type)" *ngIf="card.status.state === 'running'" [id]="'stop-' + card.type + '-btn'">
+            ⏹ Stop
+          </button>
+        </div>
+
+        <div class="last-run" *ngIf="card.status.lastRun && card.status.state !== 'running'">
+          Last run: {{ card.status.lastRun | date: 'medium' }}
+        </div>
+        <div class="last-run error-text" *ngIf="card.status.error">
+          Error: {{ card.status.error }}
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

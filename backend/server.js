@@ -7,6 +7,7 @@ const logger = require('./middleware/logger');
 const errorHandler = require('./middleware/error');
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
+const stressRoutes = require('./routes/stress');
 const User = require('./models/User');
 
 const app = express();
@@ -32,6 +33,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/stress', stressRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
