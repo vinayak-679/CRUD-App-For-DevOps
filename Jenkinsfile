@@ -5,7 +5,7 @@ pipeline {
         DOCKER_HUB = "vinayakhebbar"
         TAG = "${BUILD_NUMBER}"
         EC2_USER = "ubuntu"
-        EC2_HOST = "3.219.167.188"
+        EC2_HOST = "3.238.15.11"
     }
 
     stages {
