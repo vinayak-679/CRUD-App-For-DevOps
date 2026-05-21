@@ -25,8 +25,8 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 sh """
-                docker build -t $DOCKER_HUB/notes-backend:$TAG ./backend
-                docker build -t $DOCKER_HUB/notes-frontend:$TAG ./frontend
+                docker build -t $DOCKER_HUB/crudapp-backend:$TAG ./backend
+                docker build -t $DOCKER_HUB/crudapp-frontend:$TAG ./frontend
                 """
             }
         }
@@ -37,8 +37,8 @@ pipeline {
                     sh """
                     echo $PASS | docker login -u $USER --password-stdin
 
-                    docker push $DOCKER_HUB/notes-backend:$TAG
-                    docker push $DOCKER_HUB/notes-frontend:$TAG
+                    docker push $DOCKER_HUB/crudapp-backend:$TAG
+                    docker push $DOCKER_HUB/crudapp-frontend:$TAG
                     """
                 }
             }
@@ -47,8 +47,8 @@ pipeline {
         stage('Cleanup Local Docker Images') {
             steps {
                 sh """
-                docker rmi $DOCKER_HUB/notes-backend:$TAG || true
-                docker rmi $DOCKER_HUB/notes-frontend:$TAG || true
+                docker rmi $DOCKER_HUB/crudapp-backend:$TAG || true
+                docker rmi $DOCKER_HUB/crudapp-frontend:$TAG || true
 
                 docker image prune -f
                 """
