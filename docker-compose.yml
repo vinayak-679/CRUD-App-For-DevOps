@@ -1,0 +1,53 @@
+services:
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongodb-data:/data/db
+
+    networks:
+      - taskmanager-network
+
+  backend:
+    build: ./backend
+
+    container_name: backend
+
+    ports:
+      - "3001:3001"
+
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/taskmanager
+      JWT_SECRET: devops_practice_secret_key_2024
+      PORT: 3001
+
+    depends_on:
+      - mongodb
+
+    networks:
+      - taskmanager-network
+
+  frontend:
+    build: ./frontend
+
+    container_name: frontend
+
+    ports:
+      - "4200:80"
+
+    depends_on:
+      - backend
+
+    networks:
+      - taskmanager-network
+
+volumes:
+  mongodb-data:
+
+networks:
+  taskmanager-network:
