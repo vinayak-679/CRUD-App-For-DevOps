@@ -15,7 +15,6 @@ pipeline {
         //         git branch: 'main', url: 'YOUR_REPO_URL'
         //     }
         // }
-
         // stage('Test Docker Build') {
         //     steps {
         //         sh 'docker --version'
